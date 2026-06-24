@@ -1,0 +1,65 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  web:
+    build: .
+    env_file: .env
+    environment:
+      # 由 compose 從 POSTGRES_* / DB_* 變數組合，避免使用者手動維護兩處
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-8000}:8000"
+    restart: unless-stopped
+
+  # ------------------------------------------------------------
+  # TLS profile — only started with `docker compose --profile tls up`
+  # ------------------------------------------------------------
+  nginx:
+    image: nginx:1.27-alpine
+    profiles: [tls]
+    depends_on: [web]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      # NGINX_ENVSUBST_FILTER limits envsubst to just DOMAIN_NAME so
+      # that nginx's own $host / $remote_addr etc. survive the templates.
+      DOMAIN_NAME: ${DOMAIN_NAME}
+      NGINX_ENVSUBST_FILTER: DOMAIN_NAME
+    volumes:
+      - ./docker/nginx:/etc/nginx/templates:ro
+      - certbot-www:/var/www/certbot:ro
+      - certbot-etc:/etc/letsencrypt:ro
+    restart: unless-stopped
+
+  certbot:
+    image: certbot/certbot:latest
+    profiles: [tls]
+    volumes:
+      - certbot-www:/var/www/certbot
+      - certbot-etc:/etc/letsencrypt
+    # Run certbot renew every 12h; `wait $${!}` lets SIGTERM interrupt the sleep
+    # so docker compose stop is responsive. `$$` escapes compose interpolation.
+    entrypoint: ["/bin/sh", "-c", "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot; sleep 12h & wait $${!}; done"]
+    restart: unless-stopped
+
+volumes:
+  pgdata: {}
+  certbot-www: {}
+  certbot-etc: {}

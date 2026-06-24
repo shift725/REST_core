@@ -1,0 +1,11 @@
+# Force LF line endings on shell scripts so they execute correctly inside Linux containers
+*.sh             text eol=lf
+docker/**/*.sh   text eol=lf
+
+# Dockerfile / compose are parsed by tooling that prefers LF
+Dockerfile       text eol=lf
+.dockerignore    text eol=lf
+docker-compose*.yml text eol=lf
+
+# nginx config files should also be LF
+docker/nginx/*.conf text eol=lf

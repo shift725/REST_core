@@ -1,0 +1,13 @@
+asgiref==3.11.1
+Django==6.0.3
+djangorestframework==3.17.1
+djangorestframework_simplejwt==5.5.1
+PyJWT==2.12.1
+sqlparse==0.5.5
+tzdata==2025.3
+uuid_utils==0.14.1
+gunicorn==23.0.0
+whitenoise==6.8.2
+psycopg[binary]==3.2.3
+python-decouple==3.8
+dj-database-url==2.3.0

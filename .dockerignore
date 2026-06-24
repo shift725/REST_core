@@ -1,0 +1,46 @@
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# Python runtime artifacts
+venv/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# Dev tooling artifacts (lint / coverage) — not needed at runtime
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local dev / secrets
+.env
+.env.*
+!.env.example
+db.sqlite3
+*.sqlite3
+
+# IDE / tooling
+.idea/
+.vscode/
+
+# Project artifacts not needed at runtime
+tasks/
+docs/
+SPEC.md
+*.md
+!README.md
+requirements-dev.txt
+
+# Docker build context itself
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# OS junk
+.DS_Store
+Thumbs.db

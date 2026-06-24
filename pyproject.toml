@@ -1,0 +1,31 @@
+# Tool configuration only.
+# 本檔僅承載開發工具（ruff、coverage）設定，不做 PEP 621 / build-system packaging；
+# 依賴仍由 requirements.txt（runtime）與 requirements-dev.txt（dev）管理。
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = ["venv", "*/migrations/*", "staticfiles"]
+
+[tool.ruff.lint]
+# 保守起步：pycodestyle errors / pyflakes / isort / pyupgrade。
+# 擴張規則集（例如 B bugbear、DJ flake8-django）前請先討論。
+select = ["E", "F", "I", "UP"]
+
+[tool.ruff.format]
+# 維持專案既有的單引號風格（ruff format 預設為雙引號）。
+quote-style = "single"
+
+[tool.coverage.run]
+source = ["accounts", "config"]
+omit = [
+    "*/migrations/*",
+    "*/tests.py",
+    "manage.py",
+    "config/wsgi.py",
+    "config/asgi.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
