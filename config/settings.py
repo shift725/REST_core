@@ -92,3 +92,8 @@ SIMPLE_JWT = {
 }
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# 預設主鍵型別，跟齊 Django startproject 慣例。
+# contrib 釘 AutoField、token_blacklist 釘 BigAutoField，各自 override 不受影響；
+# 只作用在沒釘選又有 auto PK 的業務 app（如日後 M2M 中間表的隱式 PK）。
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
